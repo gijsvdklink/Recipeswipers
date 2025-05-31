@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipeswipers.com</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Vroegere iOS Status Bar is verwijderd -->
+
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="logo">Recipeswipers.<span class="green-text">com</span></h1>
+            <button id="filter-button" class="filter-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6h20M7 12h10M11 18h2" stroke="#020202" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="login-nav-button" class="filter-button" style="margin-left: 10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C14.76 4 17 6.24 17 9C17 11.76 14.76 14 12 14C9.24 14 7 11.76 7 9C7 6.24 9.24 4 12 4ZM12 16C7.58 16 4 19.58 4 24H20C20 19.58 16.42 16 12 16Z" fill="#020202"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Main Content - Recipe Card -->
+        <main class="main-content">
+            <div id="recipe-card" class="recipe-card">
+                <img id="recipe-image" src="https://via.placeholder.com/400x300?text=Laden..." alt="Recept Afbeelding">
+                <div class="recipe-info">
+                    <h2 id="recipe-title">Laden...</h2>
+                    <div class="recipe-meta">
+                        <span id="cook-time" class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22ZM12 6V12H18" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span></span>
+                        </span>
+                        <span id="difficulty" class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12H19M12 19L19 12L5 12S5 19 12 19Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="dislike-button" class="action-button dislike-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <button id="like-button" class="action-button like-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.03L12 21.35Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+        </main>
+
+        <!-- Filter Modal (Initially hidden) -->
+        <div id="filter-modal" class="filter-modal">
+            <div class="modal-content">
+                <h3>Pas je voorkeuren aan</h3>
+                <div class="filter-group">
+                    <label for="ingredients-input">Wat heb je in huis?</label>
+                    <input type="text" id="ingredients-input" placeholder="Bijv. kip, broccoli">
+                </div>
+                <div class="filter-group">
+                    <label>Maaltijdtype:</label>
+                    <div class="toggle-group">
+                        <button class="toggle-button" data-meal-type="lunch">Lunch</button>
+                        <button class="toggle-button" data-meal-type="diner">Diner</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="budget-select">Budget:</label>
+                    <select id="budget-select">
+                        <option value="">Kies...</option>
+                        <option value="laag">Laag</option>
+                        <option value="gemiddeld">Gemiddeld</option>
+                        <option value="hoog">Hoog</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="people-input">Aantal personen:</label>
+                    <input type="number" id="people-input" min="1" value="2">
+                </div>
+                <button id="apply-filters-button" class="apply-filters-button">Filters Toepassen</button>
+                <button id="close-modal-button" class="close-modal-button">Annuleren</button>
+            </div>
+        </div>
+
+        <!-- Login Modal (Initially hidden) -->
+        <div id="login-modal" class="login-modal">
+            <div class="modal-content">
+                <h3>Login / Registreer</h3>
+                <div class="input-group">
+                    <label for="login-username">Gebruikersnaam/E-mail:</label>
+                    <input type="text" id="login-username">
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Wachtwoord:</label>
+                    <input type="password" id="login-password">
+                </div>
+                <button id="login-button" class="main-button">Inloggen</button>
+                <button id="register-button" class="secondary-button">Account aanmaken</button>
+                <button id="close-login-modal-button" class="close-modal-button">Annuleren</button>
+            </div>
+        </div>
+
+    </div> <!-- /app-container -->
+
+    <script src="script.js"></script>
+</body>
+</html>
