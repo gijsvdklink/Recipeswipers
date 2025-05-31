@@ -96,6 +96,14 @@ Do not include fields such as imageUrl, bereidingstijd_minuten, moeilijkheidsgra
     }
     prompt += "\n\nBelangrijk: Geef ALLEEN het JSON object terug, zonder extra tekst ervoor of erna. Zorg dat de JSON geldig is."
 
+    if (!process.env.GEMINI_API_KEY) {
+        console.error("GEMINI_API_KEY is not configured.");
+        return res.status(503).json({
+            error: "Server configuration error",
+            message: "GEMINI_API_KEY is not configured. Please check server environment variables."
+        });
+    }
+
     try {
         console.log("AI Prompt:", prompt);
         const result = await model.generateContent(prompt);
