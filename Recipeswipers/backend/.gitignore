@@ -1,0 +1,5 @@
+node_modules/
+package-lock.json
+# Add other files and directories to ignore here if needed
+# For example, .env if it's not already ignored globally
+.env

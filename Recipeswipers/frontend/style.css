@@ -89,8 +89,8 @@ body {
     background-color: var(--light-grey);
 }
 .filter-button svg {
-    fill: var(--ios-text-color); /* For fill icons */
-    stroke: var(--ios-text-color); /* For stroke icons */
+    fill: var(--main-green); /* For fill icons */
+    stroke: var(--main-green); /* For stroke icons */
 }
 
 
@@ -113,95 +113,86 @@ body {
     box-shadow: var(--ios-shadow);
     width: 100%;
     max-width: 350px;
+    min-height: 150px; /* Ensure card is not too small */
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    justify-content: center; /* Center content vertically for shorter descriptions */
     transition: transform 0.3s ease, opacity 0.3s ease;
     flex-shrink: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    /* Ensure initial state for smooth return from animation */
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
 }
 
-.recipe-card img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    display: block;
+.recipe-card.swipe-left {
+    transform: translateX(-150%) rotate(-30deg) !important; /* Ensure swipe overrides pan */
+    opacity: 0 !important;
 }
 
-.recipe-info {
-    padding: 15px 20px 20px;
+.recipe-card.swipe-right {
+    transform: translateX(150%) rotate(30deg) !important; /* Ensure swipe overrides pan */
+    opacity: 0 !important;
+}
+
+.swipe-overlay {
+    position: absolute;
+    top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 15px;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    z-index: 10;
     text-align: center;
 }
 
+.like-overlay {
+    color: var(--main-green);
+    border: 3px solid var(--main-green);
+    left: 20px;
+    transform: rotate(-15deg);
+}
+
+.dislike-overlay {
+    color: var(--red-dislike);
+    border: 3px solid var(--red-dislike);
+    right: 20px;
+    transform: rotate(15deg);
+}
+
+/* Visibility will be controlled by JS direct opacity manipulation during pan */
+/* adding .visible class for opacity is an alternative if not dynamically adjusting opacity */
+/*
+.like-overlay.visible,
+.dislike-overlay.visible {
+    opacity: 0.8;
+}
+*/
+
+.recipe-info {
+    padding: 25px 20px; /* Increased padding */
+    text-align: center;
+    flex-grow: 1; /* Allow info to take available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .recipe-info h2 {
-    font-size: 24px;
+    font-size: 1.6em; /* Slightly larger title */
     font-weight: 700;
     color: var(--ios-text-color);
-    margin: 0 0 10px;
+    margin: 0 0 15px; /* Increased bottom margin */
 }
 
-.recipe-meta {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    font-size: 14px;
-    color: var(--dark-grey);
-}
-
-.recipe-meta .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.recipe-meta .meta-item svg {
-    height: 16px;
-    width: 16px;
-    fill: none;
-    stroke: var(--dark-grey);
-}
-.recipe-meta .meta-item span {
-    color: var(--dark-grey);
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    width: 100%;
-    position: absolute;
-    bottom: 20px;
-}
-
-.action-button {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.action-button svg {
-    width: 28px;
-    height: 28px;
-}
-
-.dislike-button {
-    background-color: var(--red-dislike);
-    color: white;
-}
-
-.like-button {
-    background-color: var(--main-green);
-    color: white;
-}
-
-.action-button:active {
-    transform: scale(0.95);
+.recipe-description {
+    font-size: 1em; /* Slightly larger description */
+    color: #555;
+    margin: 0; /* Removed top/bottom margin, padding in recipe-info handles spacing */
+    line-height: 1.5; /* Improved line height for readability */
 }
 
 /* Filter Modal Styling */

@@ -10,12 +10,10 @@ let seenRecipeIds = new Set(); // Houd bij welke recepten de gebruiker al heeft 
 
 // === DOM Elementen ===
 const recipeCard = document.getElementById('recipe-card');
-const recipeImage = document.getElementById('recipe-image');
 const recipeTitle = document.getElementById('recipe-title');
-const cookTimeSpan = document.querySelector('#cook-time span'); // Span binnen cook-time meta-item
-const difficultySpan = document.querySelector('#difficulty span'); // Span binnen difficulty meta-item
-const dislikeButton = document.getElementById('dislike-button');
-const likeButton = document.getElementById('like-button');
+const recipeDescription = document.getElementById('recipe-description');
+const likeOverlay = document.getElementById('like-overlay');
+const dislikeOverlay = document.getElementById('dislike-overlay');
 
 // Filter Modals
 const filterButton = document.getElementById('filter-button');
@@ -83,31 +81,27 @@ async function fetchRecipe() {
 function renderRecipe(recipe) {
     if (!recipe) {
         recipeTitle.textContent = 'Geen recepten gevonden!';
-        recipeImage.src = 'https://via.placeholder.com/400x300?text=Geen+recepten';
-        cookTimeSpan.textContent = '';
-        difficultySpan.textContent = '';
+        recipeDescription.textContent = '';
         dislikeButton.style.display = 'none';
         likeButton.style.display = 'none';
         return;
     }
 
-    recipeImage.src = recipe.imageUrl || 'https://via.placeholder.com/400x300?text=Recept';
     recipeTitle.textContent = recipe.titel || 'Onbekend Recept';
-    cookTimeSpan.textContent = recipe.bereidingstijd_minuten ? `${recipe.bereidingstijd_minuten} min` : 'N/A';
-    difficultySpan.textContent = recipe.moeilijkheidsgraad || 'N/A';
-    
-    dislikeButton.style.display = 'flex';
-    likeButton.style.display = 'flex';
+    recipeDescription.textContent = recipe.korte_beschrijving || 'No description available.';
 }
 
 async function loadNextRecipe() {
     // Toon laad-status
-    recipeImage.src = 'https://via.placeholder.com/400x300?text=Laden...';
     recipeTitle.textContent = 'Recept wordt geladen...';
-    cookTimeSpan.textContent = '';
-    difficultySpan.textContent = '';
-    dislikeButton.style.display = 'none';
-    likeButton.style.display = 'none';
+    recipeDescription.textContent = '';
+
+    // Reset card position and opacity before loading new content
+    recipeCard.style.transform = 'translateX(0px) translateY(0px) rotate(0deg)';
+    recipeCard.style.opacity = 1;
+    recipeCard.classList.remove('swipe-left', 'swipe-right'); // Ensure animation classes are removed
+    if(likeOverlay) likeOverlay.style.opacity = 0;
+    if(dislikeOverlay) dislikeOverlay.style.opacity = 0;
 
     const recipe = await fetchRecipe();
     renderRecipe(recipe);
@@ -130,21 +124,81 @@ async function sendSwipeAction(recipeId, direction) {
     }
 }
 
-// === Event Listeners ===
-dislikeButton.addEventListener('click', () => {
-    const currentRecipeId = recipeTitle.textContent; // Gebruik titel als simpele ID voor MVP
-    if (currentRecipeId && currentRecipeId !== 'Geen recepten gevonden!' && currentRecipeId !== 'Recept wordt geladen...') {
-        sendSwipeAction(currentRecipeId, 'dislike');
-    }
-    loadNextRecipe();
-});
+// === ZingTouch Pan & Swipe Initialization ===
+const mainContentRegion = document.querySelector('.main-content');
+const touchRegion = new ZingTouch.Region(mainContentRegion, false, true); // capture: false, preventDefault: true (standard)
 
-likeButton.addEventListener('click', () => {
-    const currentRecipeId = recipeTitle.textContent; // Gebruik titel als simpele ID voor MVP
-    if (currentRecipeId && currentRecipeId !== 'Geen recepten gevonden!' && currentRecipeId !== 'Recept wordt geladen...') {
-        sendSwipeAction(currentRecipeId, 'like');
+// Unbind previous swipe if any (e.g. from previous step, good practice)
+// touchRegion.unbind(recipeCard, 'swipe'); // Not strictly needed if recipeCard was not directly bound before
+
+let initialCardX = 0;
+let initialCardY = 0; // Though Y is not used much in this horizontal swipe
+
+touchRegion.bind(recipeCard, 'pan', function(e) {
+    const card = recipeCard; // recipeCard is already the DOM element
+    const distanceX = e.detail.data[0].distanceFromOriginX;
+    const distanceY = e.detail.data[0].distanceFromOriginY; // Keep for potential future use
+    // const direction = e.detail.data[0].directionFromOrigin; // Angle, less critical now with pan
+    const threshold = card.offsetWidth / 3;
+
+    if (e.detail.events[0].type === 'panstart') {
+        // Try to get numerical value of current transform if any
+        const currentTransform = window.getComputedStyle(card).transform;
+        if (currentTransform && currentTransform !== 'none') {
+            const matrix = new DOMMatrix(currentTransform);
+            initialCardX = matrix.m41; // e value for translateX
+            initialCardY = matrix.m42; // f value for translateY
+        } else {
+            initialCardX = 0;
+            initialCardY = 0;
+        }
+        card.style.transition = 'none'; // Disable transition during pan for direct control
     }
-    loadNextRecipe();
+
+    // Move card with finger
+    card.style.transform = `translateX(${initialCardX + distanceX}px) translateY(${initialCardY + distanceY}px) rotate(${distanceX / 10}deg)`;
+
+    // Show/Hide Overlays based on drag direction and distance
+    const opacity = Math.min(Math.abs(distanceX) / threshold, 0.8); // Cap opacity at 0.8 for overlays
+    if (distanceX > 10) { // Moving right (potential like), added a small buffer of 10px
+        likeOverlay.style.opacity = opacity;
+        dislikeOverlay.style.opacity = 0;
+    } else if (distanceX < -10) { // Moving left (potential dislike), added a small buffer of 10px
+        dislikeOverlay.style.opacity = opacity;
+        likeOverlay.style.opacity = 0;
+    } else {
+        likeOverlay.style.opacity = 0;
+        dislikeOverlay.style.opacity = 0;
+    }
+
+    if (e.detail.events[0].type === 'panend') {
+        card.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out'; // Re-enable transition
+        likeOverlay.style.opacity = 0;
+        dislikeOverlay.style.opacity = 0;
+
+        const currentRecipeId = recipeTitle.textContent;
+        if (currentRecipeId && currentRecipeId !== 'Geen recepten gevonden!' && currentRecipeId !== 'Recept wordt geladen...') {
+            if (Math.abs(distanceX) > threshold) { // Swipe confirmed
+                if (distanceX > threshold) { // Swipe Right (Like)
+                    console.log("Pan led to Swipe Right");
+                    card.classList.add('swipe-right');
+                    sendSwipeAction(currentRecipeId, 'like');
+                } else { // Swipe Left (Dislike)
+                    console.log("Pan led to Swipe Left");
+                    card.classList.add('swipe-left');
+                    sendSwipeAction(currentRecipeId, 'dislike');
+                }
+                setTimeout(() => {
+                    loadNextRecipe(); // loadNextRecipe will remove classes and reset style
+                }, 300);
+            } else { // Not a swipe, reset card position
+                console.log("Pan ended, not a swipe, resetting card.");
+                card.style.transform = 'translateX(0px) translateY(0px) rotate(0deg)';
+            }
+        } else { // No valid recipe to swipe, just reset
+             card.style.transform = 'translateX(0px) translateY(0px) rotate(0deg)';
+        }
+    }
 });
 
 // Filter Modal Events
@@ -253,4 +307,8 @@ registerButton.addEventListener('click', async () => {
 
 
 // === Initialisatie ===
+// Hide the login navigation button as login functionality is not implemented
+if (loginNavButton) {
+    loginNavButton.style.display = 'none';
+}
 loadNextRecipe(); // Laad het eerste recept bij het starten van de app
