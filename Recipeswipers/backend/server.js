@@ -81,25 +81,20 @@ app.get('/api/recipe', async (req, res) => {
 {
   "id": "unieke_string_id",
   "titel": "string",
-  "korte_beschrijving": "string (max 2 zinnen)",
-  "imageUrl": "string (placeholder URL)",
-  "bereidingstijd_minuten": "integer",
-  "moeilijkheidsgraad": "string (Makkelijk, Gemiddeld, Moeilijk)",
-  "ingredienten": ["string", "string", ...],
-  "instructies": ["string", "string", ...]
+  "korte_beschrijving": "string (max 2 zinnen, engaging and concise)"
 }
-`;
-    if (mealType) prompt += `De maaltijd is voor ${mealType}. `;
-    if (ingredients) prompt += `Gebruik ${ingredients} als hoofdingrediënt. `;
-    if (budget) prompt += `Het budget is ${budget}. `;
-    if (people) prompt += `Voor ${people} persoon/personen. `;
-    prompt += `Zorg dat het recept niet te complex is en geef een unieke ID die past bij het recept.`;
-    prompt += `De imageUrl is altijd een placeholder.`;
+Do not include fields such as imageUrl, bereidingstijd_minuten, moeilijkheidsgraad, ingredienten, or instructies in the JSON response.`;
+    if (mealType) prompt += `\n- Type maaltijd: ${mealType}.`;
+    if (ingredients) prompt += `\n- Moet deze ingrediënten bevatten: ${ingredients}.`; // Assuming ingredients is a string from query
+    if (budget) prompt += `\n- Budget: ${budget}.`;
+    if (people) prompt += `\n- Aantal personen: ${people}.`;
+    prompt += `\nZorg dat het recept niet te complex is en geef een unieke ID die past bij het recept.`;
 
     // Voeg disliked recepten van de gebruiker toe aan de prompt als userId bekend is
     if (userId && users[userId] && users[userId].dislikedRecipes.length > 0) {
-        prompt += ` Vermijd recepten die lijken op: ${users[userId].dislikedRecipes.join(', ')}.`;
+        prompt += `\n- Vermijd recepten die lijken op (ID's): ${users[userId].dislikedRecipes.join(', ')}. Genereer iets nieuws.`;
     }
+    prompt += "\n\nBelangrijk: Geef ALLEEN het JSON object terug, zonder extra tekst ervoor of erna. Zorg dat de JSON geldig is."
 
     try {
         console.log("AI Prompt:", prompt);
@@ -111,11 +106,6 @@ app.get('/api/recipe', async (req, res) => {
 
         const cleanedText = text.replace(/```json|```/g, '').trim();
         const parsedRecipe = JSON.parse(cleanedText);
-
-        // Voeg placeholder afbeelding toe als die ontbreekt (AI genereert geen afbeeldingen)
-        if (!parsedRecipe.imageUrl || parsedRecipe.imageUrl.includes('placeholder')) {
-            parsedRecipe.imageUrl = `https://via.placeholder.com/400x300?text=${encodeURIComponent(parsedRecipe.titel || 'Recipe')}`;
-        }
 
         res.json(parsedRecipe);
 
