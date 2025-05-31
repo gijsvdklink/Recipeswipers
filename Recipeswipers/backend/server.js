@@ -1,4 +1,5 @@
 require('dotenv').config(); // Laad omgevingsvariabelen
+const path = require('path');
 const express = require('express');
 const cors = require('cors'); // Nodig voor communicatie met frontend
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -10,12 +11,20 @@ const PORT = process.env.PORT || 3000;
 app.use(cors()); // Schakel CORS in (laat frontend verbinden)
 app.use(express.json()); // Voor het parsen van JSON body's
 
+// Serve static files from the frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 // In-memory opslag voor MVP gebruikers en swipe-geschiedenis (NIET voor productie!)
 const users = {}; // { username: { password, preferences: {}, likedRecipes: [], dislikedRecipes: [] } }
 
 // Initialiseer Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+// Serve frontend index.html for the root path
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
 // === API Endpoints ===
 
