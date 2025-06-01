@@ -96,7 +96,7 @@ function updateCardStackPositions() {
         card.style.transform = `translateY(${offset}px) scale(${scale})`;
         card.style.zIndex = MAX_CARDS_IN_STACK - index; // Top card has highest z-index
         card.style.opacity = 1; // Ensure visibility for all cards in stack
-        card.style.transition = 'transform 0.3s ease-out, z-index 0s, opacity 0.3s ease-out';
+        card.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
     });
 
     // If the stack is empty, display "No recipes found!" message
