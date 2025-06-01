@@ -16,19 +16,25 @@
                     <path d="M3 6h20M7 12h10M11 18h2" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
-            <!-- Login button removed -->
         </header>
 
-        <!-- Main Content - Recipe Card -->
+        <!-- Main Content - Recipe Card Stack -->
         <main class="main-content">
-            <div id="recipe-card" class="recipe-card">
-                <div class="recipe-info">
-                    <h2 id="recipe-title">Loading...</h2>
-                    <p id="recipe-description" class="recipe-description"></p>
+            <div id="recipe-stack-container" class="recipe-stack-container">
+                <!-- Recipe cards will be dynamically loaded here by JavaScript -->
+                <div id="loading-card" class="swipe-card loading-card">
+                    <div class="recipe-image-container">
+                        <img src="https://picsum.photos/400/300?random=loading" alt="Loading...">
+                    </div>
+                    <div class="recipe-info">
+                        <h2>Loading Recipes...</h2>
+                        <p>Please wait a moment while we fetch delicious ideas for you!</p>
+                    </div>
                 </div>
-                <div id="like-overlay" class="swipe-overlay like-overlay">👍 LIKE</div>
-                <div id="dislike-overlay" class="swipe-overlay dislike-overlay">👎 DISLIKE</div>
             </div>
+            <!-- Swipe Overlays are global, positioned over the top card -->
+            <div id="like-overlay" class="swipe-overlay like-overlay">👍 LIKE</div>
+            <div id="dislike-overlay" class="swipe-overlay dislike-overlay">👎 DISLIKE</div>
         </main>
 
         <!-- Filter Modal (Initially hidden) -->
@@ -64,7 +70,58 @@
             </div>
         </div>
 
-        <!-- Login Modal removed -->
+        <!-- My Recipes Modal (Initially hidden) -->
+        <div id="my-recipes-modal" class="filter-modal">
+            <div class="modal-content large-modal">
+                <h3>My Saved Recipes</h3>
+                <div id="saved-recipes-list" class="saved-recipes-grid">
+                    <p id="no-saved-recipes" class="no-saved-recipes-message">No recipes saved yet. Swipe right to save one!</p>
+                </div>
+                <button id="close-my-recipes-modal-button" class="close-modal-button secondary-button">Close</button>
+            </div>
+        </div>
+
+        <!-- Full Recipe Details Modal (Initially hidden) -->
+        <div id="full-recipe-details-modal" class="filter-modal">
+            <div class="modal-content large-modal scrollable-modal">
+                <h3 id="full-recipe-title"></h3>
+                <p id="full-recipe-short-description" class="recipe-description"></p>
+                <img id="full-recipe-image" src="" alt="Recipe Image" class="full-recipe-image">
+
+                <div class="recipe-meta-data">
+                    <p><strong>Prep Time:</strong> <span id="full-recipe-prep-time"></span> minutes</p>
+                    <p><strong>Difficulty:</strong> <span id="full-recipe-difficulty"></span></p>
+                </div>
+
+                <h4>Ingredients:</h4>
+                <ul id="full-recipe-ingredients">
+                    <!-- Ingredients will be loaded here -->
+                </ul>
+
+                <h4>Instructions:</h4>
+                <ol id="full-recipe-instructions">
+                    <!-- Instructions will be loaded here -->
+                </ol>
+
+                <button id="close-full-recipe-modal-button" class="close-modal-button secondary-button">Close</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <button id="home-nav-button" class="nav-button active">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span>Home</span>
+            </button>
+            <button id="my-recipes-nav-button" class="nav-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 2h-8L4 8v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zM9 16H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
+                </svg>
+                <span>My Recipes</span>
+            </button>
+        </nav>
 
     </div> <!-- /app-container -->
 

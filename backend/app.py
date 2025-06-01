@@ -4,7 +4,7 @@ import re
 from flask import Flask, send_from_directory, jsonify, request
 from dotenv import load_dotenv
 
-from flask_cors import CORS # VERIFIED: Import Flask-CORS
+from flask_cors import CORS
 
 import google.generativeai as genai
 
@@ -12,12 +12,10 @@ import google.generativeai as genai
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app) # VERIFIED: Initialize CORS for your Flask app. This allows cross-origin requests.
+CORS(app) # Enable CORS for all routes
 
-# Determine the port. Use the .env variable PORT, otherwise default to 5000
 PORT = int(os.getenv('PORT', 5000))
 
-# Configure the Gemini API with the key from .env
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 if not GEMINI_API_KEY:
     print("CRITICAL ERROR: GEMINI_API_KEY is not set in .env. Recipe generation will fail.")
@@ -25,7 +23,7 @@ if not GEMINI_API_KEY:
 else:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash-latest") # VERIFIED WORKING MODEL
+        model = genai.GenerativeModel("gemini-1.5-flash-latest")
         print("Gemini 'gemini-1.5-flash-latest' model loaded successfully.")
     except Exception as e:
         print(f"CRITICAL ERROR: Could not load the Gemini model 'gemini-1.5-flash-latest'. Details: {e}")
@@ -33,20 +31,16 @@ else:
         model = None
 
 
-# Define the path to the frontend static files
 FRONTEND_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../frontend')
 
-# Serve static frontend files
 @app.route('/<path:filename>')
 def serve_frontend_static(filename):
     return send_from_directory(FRONTEND_FOLDER, filename)
 
-# Serve the main page (index.html) for the root URL '/'
 @app.route('/')
 def serve_index():
     return send_from_directory(FRONTEND_FOLDER, 'index.html')
 
-# API ENDPOINT FOR RECIPE GENERATION (with Gemini)
 @app.route('/api/recipe')
 def get_recipe():
     print("\n--- /api/recipe called ---")
@@ -54,23 +48,34 @@ def get_recipe():
         print("ERROR: Gemini model is not loaded. Returning 503.")
         return jsonify({'error': 'Gemini model is not loaded, cannot generate recipe. Check backend console.'}), 503
 
-    # Retrieve parameters from the frontend (filters)
     meal_type = request.args.get('mealType', '')
     ingredients = request.args.get('ingredients', '')
     budget = request.args.get('budget', '')
     people = request.args.get('people', '')
 
-    # Build the prompt for the AI
+    # --- AANGEPASTE AI PROMPT: VRAAGT NU MEER DETAILS ---
     prompt = f"""Generate one unique, creative, and practical recipe. Provide the output strictly as a JSON object with the following structure:
 {{
   "id": "unique_string_id",
   "title": "string",
-  "short_description": "string (max 2 sentences, engaging and concise)"
+  "short_description": "string (max 2 sentences, engaging and concise)",
+  "image_url": "string (a placeholder URL for an image, e.g., from Unsplash.com or LoremPicsum.photos)",
+  "preparation_time_minutes": "integer",
+  "difficulty": "string (e.g., 'Easy', 'Medium', 'Hard')",
+  "ingredients": [
+    "string (ingredient 1)",
+    "string (ingredient 2)",
+    "..."
+  ],
+  "instructions": [
+    "string (step 1)",
+    "string (step 2)",
+    "..."
+  ]
 }}
-Do not include fields such as imageUrl, preparation_time_minutes, difficulty, ingredients, or instructions in the JSON response.
 Ensure the recipe is not too complex and provide a unique ID that fits the recipe.
+For 'image_url', use a generic placeholder like 'https://picsum.photos/400/300?random=1'
 """
-    # Add filters to the prompt if they are present
     if meal_type:
         prompt += f"\n- Meal type: {meal_type}."
     if ingredients:
@@ -83,10 +88,10 @@ Ensure the recipe is not too complex and provide a unique ID that fits the recip
     prompt += "\n\nImportant: ONLY return the JSON object, without any extra text before or after it. Ensure the JSON is valid and complete."
 
     try:
-        print(f"AI Prompt:\n---\n{prompt}\n---") # Debugging the prompt
+        print(f"AI Prompt:\n---\n{prompt}\n---")
         response = model.generate_content(prompt)
         raw_text = response.text
-        print(f"Raw AI Response:\n---\n{raw_text}\n---") # Debugging the raw AI response
+        print(f"Raw AI Response:\n---\n{raw_text}\n---")
 
         json_match = re.search(r'```json\s*(\{.*\})\s*```', raw_text, re.DOTALL)
         if json_match:
@@ -103,10 +108,16 @@ Ensure the recipe is not too complex and provide a unique ID that fits the recip
                 raise ValueError("No valid JSON object found in the AI response.")
 
         parsed_recipe = json.loads(cleaned_json_string)
+        # --- AANGEPASTE PARSING: INCLUSIEF NIEUWE VELDEN ---
         recipe_output = {
-            'id': parsed_recipe.get('id', 'default_id'),
+            'id': parsed_recipe.get('id', 'default_id_' + str(os.urandom(4).hex())), # Generate unique ID
             'title': parsed_recipe.get('title', 'Unknown Recipe'),
-            'short_description': parsed_recipe.get('short_description', 'No description available.')
+            'short_description': parsed_recipe.get('short_description', 'No description available.'),
+            'image_url': parsed_recipe.get('image_url', 'https://picsum.photos/400/300?random=1'),
+            'preparation_time_minutes': parsed_recipe.get('preparation_time_minutes', None),
+            'difficulty': parsed_recipe.get('difficulty', None),
+            'ingredients': parsed_recipe.get('ingredients', []),
+            'instructions': parsed_recipe.get('instructions', [])
         }
         print(f"Successfully parsed recipe_output:\n{json.dumps(recipe_output, indent=2)}")
         return jsonify(recipe_output)
@@ -119,7 +130,6 @@ Ensure the recipe is not too complex and provide a unique ID that fits the recip
         print(f"ERROR during AI recipe generation: {e}")
         return jsonify({'error': f'Could not generate recipe. Please try again. Details: {e}'}), 500
 
-# Example endpoint to test if the backend is running
 @app.route('/hello')
 def hello_world():
     return 'Hello from the Python Backend!'
@@ -127,4 +137,4 @@ def hello_world():
 if __name__ == '__main__':
     print(f"Backend server running on http://127.0.0.1:{PORT}")
     print(f"Open your browser and go to http://127.0.0.1:{PORT}")
-    app.run(debug=True, port=PORT)
+    app.run(debug=True, port=PORT, host='0.0.0.0') # AANGEPAST: host='0.0.0.0' toegevoegd
