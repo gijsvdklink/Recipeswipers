@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipeswipers.com</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="logo">Recipeswipers.<span class="green-text">com</span></h1>
+            <button id="filter-button" class="filter-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6h20M7 12h10M11 18h2" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <!-- Login button removed -->
+        </header>
+
+        <!-- Main Content - Recipe Card -->
+        <main class="main-content">
+            <div id="recipe-card" class="recipe-card">
+                <div class="recipe-info">
+                    <h2 id="recipe-title">Loading...</h2>
+                    <p id="recipe-description" class="recipe-description"></p>
+                </div>
+                <div id="like-overlay" class="swipe-overlay like-overlay">👍 LIKE</div>
+                <div id="dislike-overlay" class="swipe-overlay dislike-overlay">👎 DISLIKE</div>
+            </div>
+        </main>
+
+        <!-- Filter Modal (Initially hidden) -->
+        <div id="filter-modal" class="filter-modal">
+            <div class="modal-content">
+                <h3>Adjust your preferences</h3>
+                <div class="filter-group">
+                    <label for="ingredients-input">What do you have at home?</label>
+                    <input type="text" id="ingredients-input" placeholder="E.g., chicken, broccoli">
+                </div>
+                <div class="filter-group">
+                    <label>Meal type:</label>
+                    <div class="toggle-group">
+                        <button class="toggle-button" data-meal-type="lunch">Lunch</button>
+                        <button class="toggle-button" data-meal-type="dinner">Dinner</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="budget-select">Budget:</label>
+                    <select id="budget-select">
+                        <option value="">Choose...</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="people-input">Number of people:</label>
+                    <input type="number" id="people-input" min="1" value="2">
+                </div>
+                <button id="apply-filters-button" class="apply-filters-button">Apply Filters</button>
+                <button id="close-modal-button" class="close-modal-button secondary-button">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Login Modal removed -->
+
+    </div> <!-- /app-container -->
+
+    <script src="https://cdn.jsdelivr.net/npm/zingtouch@1.0.6/dist/zingtouch.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

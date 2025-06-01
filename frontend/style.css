@@ -1,0 +1,294 @@
+:root {
+    --main-green: #4CAF50; /* Bright green */
+    --light-green: #8BC34A; /* Lighter shade */
+    --dark-green: #388E3C; /* Darker shade */
+    --light-grey: #F5F5F5;
+    --medium-grey: #CCCCCC;
+    --dark-grey: #333;
+    --red-dislike: #FF5252;
+    --ios-bg-color: #F8F8F8;
+    --ios-border-radius: 12px;
+    --ios-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --ios-text-color: #333;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--ios-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh;
+    max-height: 850px;
+    background-color: white;
+    border-radius: var(--ios-border-radius);
+    box-shadow: var(--ios-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--light-grey);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--ios-text-color);
+    margin: 0;
+}
+
+.logo .green-text {
+    color: var(--main-green);
+}
+
+.filter-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+.filter-button:hover {
+    background-color: var(--light-grey);
+}
+.filter-button svg {
+    stroke: var(--main-green);
+    fill: var(--main-green);
+}
+
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+    position: relative;
+}
+
+/* Recipe Card */
+.recipe-card {
+    background-color: white;
+    border-radius: var(--ios-border-radius);
+    box-shadow: var(--ios-shadow);
+    width: 100%;
+    max-width: 350px;
+    min-height: 150px; /* Ensure card is not too small */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically for shorter descriptions */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    flex-shrink: 0;
+    transform: translateX(0) rotate(0deg); /* Ensure initial state for smooth return from animation */
+    opacity: 1;
+}
+
+.recipe-card.swipe-left {
+    transform: translateX(-150%) rotate(-30deg) !important; /* Ensure swipe overrides pan */
+    opacity: 0 !important;
+}
+
+.recipe-card.swipe-right {
+    transform: translateX(150%) rotate(30deg) !important; /* Ensure swipe overrides pan */
+    opacity: 0 !important;
+}
+
+.swipe-overlay {
+    position: absolute;
+    top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 15px;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.like-overlay {
+    color: var(--main-green);
+    border: 3px solid var(--main-green);
+    left: 20px;
+    transform: rotate(-15deg);
+}
+
+.dislike-overlay {
+    color: var(--red-dislike);
+    border: 3px solid var(--red-dislike);
+    right: 20px;
+    transform: rotate(15deg);
+}
+
+.recipe-info {
+    padding: 25px 20px;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.recipe-info h2 {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--ios-text-color);
+    margin: 0 0 15px;
+}
+
+.recipe-description {
+    font-size: 1em;
+    color: #555;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Filter Modal Styling */
+.filter-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.filter-modal.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--ios-border-radius);
+    box-shadow: var(--ios-shadow);
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-content h3 {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--ios-text-color);
+    margin-top: 0;
+    text-align: center;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-grey);
+}
+
+.filter-group input, .filter-group select {
+    padding: 10px 12px;
+    border: 1px solid var(--medium-grey);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--ios-text-color);
+}
+
+.toggle-group {
+    display: flex;
+    border: 1px solid var(--main-green);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.toggle-button {
+    flex: 1;
+    padding: 10px 15px;
+    background-color: white;
+    color: var(--main-green);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.toggle-button:not(:last-child) {
+    border-right: 1px solid var(--main-green);
+}
+
+.toggle-button.active {
+    background-color: var(--main-green);
+    color: white;
+}
+
+.apply-filters-button, .main-button {
+    background-color: var(--main-green);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.apply-filters-button:hover, .main-button:hover {
+    background-color: var(--dark-green);
+}
+
+.close-modal-button, .secondary-button {
+    background: none;
+    border: none;
+    color: var(--dark-grey);
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+.secondary-button {
+    color: var(--main-green);
+    font-weight: 600;
+}
+
+.close-modal-button:hover, .secondary-button:hover {
+    color: var(--main-green);
+}
