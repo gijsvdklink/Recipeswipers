@@ -116,7 +116,7 @@ body {
     left: 0;
     cursor: grab; /* Indicate it's draggable */
     user-select: none; /* Prevent text selection during drag */
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out, z-index 0s 0.3s; /* z-index transition delay */
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* z-index transition delay */
 }
 
 .swipe-card.loading-card {
